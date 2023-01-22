@@ -14,7 +14,10 @@ dependencies {
         'org.junit.jupiter:junit-jupiter:5.8.1',
         'io.rest-assured:rest-assured:5.3.0',
         'io.rest-assured:json-schema-validator:5.3.0',
-        'org.assertj:assertj-core:3.24.2'
+        'org.assertj:assertj-core:3.24.2',
+        'com.codeborne:selenide:6.11.0'
+
+
 
     )
 
