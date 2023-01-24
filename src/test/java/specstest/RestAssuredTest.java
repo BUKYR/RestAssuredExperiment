@@ -1,27 +1,27 @@
-package testrestassured;
+package specstest;
 
 import org.junit.jupiter.api.Test;
+import specstest.models.*;
 
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.is;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static specstest.Specs.request;
+import static specstest.Specs.response;
 
 public class RestAssuredTest {
 
 
-    String baseUrl = "https://reqres.in/api";
-
     @Test
     void testGetListUserArrayCount() {
         given()
-                .log().uri()
+                .spec(request)
                 .when()
-                .get(baseUrl + "/users?page=2")
+                .get("/users?page=2")
                 .then()
-                .log().status()
-                .statusCode(200)
+                .spec(response)
                 .body("data.size()", is(6));
     }
 
@@ -29,9 +29,9 @@ public class RestAssuredTest {
     void testSchemaForSingleUser() {
 
         given()
-                .log().uri()
+                .spec(request)
                 .when()
-                .get(baseUrl + "/users/2")
+                .get("/users/2")
                 .then()
                 .log().status()
                 .log().body()
@@ -42,9 +42,9 @@ public class RestAssuredTest {
     void testOfDeleteUser() {
 
         given()
-                .log().uri()
+                .spec(request)
                 .when()
-                .delete(baseUrl + "/users/2")
+                .delete("/users/2")
                 .then()
                 .statusCode(204);
     }
@@ -58,7 +58,7 @@ public class RestAssuredTest {
                 .log().uri()
                 .when()
                 .body(bodyRequest)
-                .post(baseUrl + "/register")
+                .post("https://reqres.in/api/register")
                 .then()
                 .log().body()
                 .statusCode(400)
@@ -69,15 +69,27 @@ public class RestAssuredTest {
     void checkFullResponseBody() {
 
         given()
-                .log().uri()
+                .spec(request)
                 .when()
-                .get(baseUrl + "/unknown/2")
+                .get("/unknown/2")
                 .then()
                 .log().body()
                 .body("data.name", is("fuchsia rose"));
 
+    }
 
+    @Test
+    void testModelForSingleUser() {
 
+       UserData data = given()
+                .spec(request)
+                .when()
+                .get("/users/2")
+                .then()
+                .spec(response)
+                .log().body()
+                .extract().as(UserData.class);
+        assertEquals(2, data.getData());
 
     }
 
