@@ -6,6 +6,7 @@ import specstest.models.*;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static specstest.Specs.request;
 import static specstest.Specs.response;
@@ -16,6 +17,34 @@ public class RestAssuredTest {
 
 
     @Test
+    void testForSingleUserWhitModel() {
+
+        UserData data = given()
+                .spec(request)
+                .when()
+                .get("/users/2")
+                .then()
+                .spec(response)
+                .log().body()
+                .extract().as(UserData.class);
+
+        assertThat(data.getData().getEmail()).isEqualTo("janet.weaver@reqres.in");
+        assertThat(data.getSupport().getText()).isEqualTo("To keep ReqRes free, contributions towards server costs are appreciated!");
+
+    }
+
+    @Test
+    void checkEmailInUserListForSingleUser() {
+        given()
+                .spec(request)
+                .when()
+                .get("/users?page=2")
+                .then()
+                .spec(response)
+                .body("data.findAll{it.id == 7}.email", hasItem("michael.lawson@reqres.in"));
+    }
+
+    @Test
     void testGetListUserArrayCount() {
         given()
                 .spec(request)
@@ -23,6 +52,7 @@ public class RestAssuredTest {
                 .get("/users?page=2")
                 .then()
                 .spec(response)
+                .log().body()
                 .body("data.size()", is(6));
     }
 
@@ -79,24 +109,7 @@ public class RestAssuredTest {
 
     }
 
-    @Test
-    void testModelForSingleUser() {
 
-       UserData data = given()
-                .spec(request)
-                .when()
-                .get("/users/2")
-                .then()
-                .spec(response)
-                .log().body()
-                .extract().as(UserData.class);
-
-       assertThat(data.getData().getId()).isEqualTo(2);
-
-
-
-
-    }
 
 
 
