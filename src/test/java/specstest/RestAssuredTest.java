@@ -7,9 +7,10 @@ import specstest.models.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static specstest.Specs.request;
 import static specstest.Specs.response;
+import static org.assertj.core.api.Assertions.*;
+
 
 public class RestAssuredTest {
 
@@ -89,7 +90,11 @@ public class RestAssuredTest {
                 .spec(response)
                 .log().body()
                 .extract().as(UserData.class);
-        assertEquals(2, data.getData());
+
+       assertThat(data.getData().getId()).isEqualTo(2);
+
+
+
 
     }
 
