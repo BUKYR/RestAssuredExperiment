@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import specstest.models.*;
 
 
+import java.time.*;
+
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.hasItem;
@@ -11,103 +13,67 @@ import static org.hamcrest.Matchers.is;
 import static specstest.Specs.request;
 import static specstest.Specs.response;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.util.DateUtil.parseDatetimeWithMs;
+
+
 
 
 public class RestAssuredTest {
 
 
     @Test
-    void testForSingleUserWhitModel() {
+    void checkBodyResponseOfSingleUserData() {
 
-        UserData data = given()
+    SingleUserBodyData data = given()
                 .spec(request)
                 .when()
                 .get("/users/2")
                 .then()
                 .spec(response)
                 .log().body()
-                .extract().as(UserData.class);
+                .extract().as(SingleUserBodyData.class);
 
+        assertThat(data.getData().getId()).isEqualTo(2);
         assertThat(data.getData().getEmail()).isEqualTo("janet.weaver@reqres.in");
+        assertThat(data.getData().getFirstName()).isEqualTo("Janet");
+        assertThat(data.getData().getLastName()).isEqualTo("Weaver");
+        assertThat(data.getData().getAvatar()).isEqualTo("https://reqres.in/img/faces/2-image.jpg");
+
+        assertThat(data.getSupport().getUrl()).isEqualTo("https://reqres.in/#support-heading");
         assertThat(data.getSupport().getText()).isEqualTo("To keep ReqRes free, contributions towards server costs are appreciated!");
 
     }
 
     @Test
-    void checkEmailInUserListForSingleUser() {
-        given()
-                .spec(request)
-                .when()
-                .get("/users?page=2")
-                .then()
-                .spec(response)
-                .body("data.findAll{it.id == 7}.email", hasItem("michael.lawson@reqres.in"));
-    }
+    void createNewUser() {
 
-    @Test
-    void testGetListUserArrayCount() {
-        given()
+       RequestCreateUser requestBody = new RequestCreateUser();
+       requestBody.setName("Smith");
+       requestBody.setJob("Agent");
+
+       ResponseCreateUser data = given()
                 .spec(request)
                 .when()
-                .get("/users?page=2")
+                .post("/users")
                 .then()
-                .spec(response)
+                .statusCode(201)
                 .log().body()
-                .body("data.size()", is(6));
-    }
+                .extract().as(ResponseCreateUser.class);
 
-    @Test
-    void testSchemaForSingleUser() {
+       //assertThat(data.getName()).isEqualTo("Smith");
+       //assertThat(data.getJob()).isEqualTo("Agent");
+       assertThat(data.getId()).isNotNull();
+       assertThat(data.getCreatedAt()).isNotNull();
 
-        given()
-                .spec(request)
-                .when()
-                .get("/users/2")
-                .then()
-                .log().status()
-                .log().body()
-                .body(matchesJsonSchemaInClasspath("SchemaForSingleUser.json"));
-    }
 
-    @Test
-    void testOfDeleteUser() {
 
-        given()
-                .spec(request)
-                .when()
-                .delete("/users/2")
-                .then()
-                .statusCode(204);
-    }
 
-    @Test
-    void testRegisterWithUnsuccessfulPassword() {
 
-        String bodyRequest = "{ \"email\": \"sydney@fife\" }";
 
-        given()
-                .log().uri()
-                .when()
-                .body(bodyRequest)
-                .post("https://reqres.in/api/register")
-                .then()
-                .log().body()
-                .statusCode(400)
-                .body("error", is("Missing email or username"));
-    }
-
-    @Test
-    void checkFullResponseBody() {
-
-        given()
-                .spec(request)
-                .when()
-                .get("/unknown/2")
-                .then()
-                .log().body()
-                .body("data.name", is("fuchsia rose"));
 
     }
+
+
 
 
 

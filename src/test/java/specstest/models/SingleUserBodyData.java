@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserData {
-    private User data;
-    private User support;
-
+public class SingleUserBodyData {
+    private SingleUserData data;
+    private SingleUserData support;
 }
