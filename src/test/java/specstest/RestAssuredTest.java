@@ -4,17 +4,10 @@ import org.junit.jupiter.api.Test;
 import specstest.models.*;
 
 
-import java.time.*;
-
 import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
 import static specstest.Specs.request;
 import static specstest.Specs.response;
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.util.DateUtil.parseDatetimeWithMs;
-
 
 
 
@@ -64,12 +57,6 @@ public class RestAssuredTest {
        //assertThat(data.getJob()).isEqualTo("Agent");
        assertThat(data.getId()).isNotNull();
        assertThat(data.getCreatedAt()).isNotNull();
-
-
-
-
-
-
 
     }
 
