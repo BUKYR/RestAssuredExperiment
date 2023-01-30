@@ -1,5 +1,6 @@
 package specstest;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -19,6 +20,7 @@ public class RestAssuredTest {
 
 
     @Test
+    @DisplayName("Проверка тела пользователя")
     void checkBodyResponseOfSingleUserData() {
 
     SingleUserBodyData data = given()
@@ -44,6 +46,7 @@ public class RestAssuredTest {
     }
 
     @Test
+    @DisplayName("Проверка тела ответа и статус кода при создании нового пользователя")
     void createNewUser() {
 
        RequestCreateUser requestBody = new RequestCreateUser();
@@ -67,7 +70,7 @@ public class RestAssuredTest {
     }
 
     @ValueSource(ints = {13, 14, 15, 16})
-    @ParameterizedTest
+    @ParameterizedTest(name = "Проверка статускода при ненайденом пользователе c id {0}")
     void checkUserNotFound(int id) {
 
         given()
@@ -80,6 +83,7 @@ public class RestAssuredTest {
     }
 
     @Test
+    @DisplayName("Проверка статус кода при удалении пользователя")
     void checkStatusCodeDelete() {
 
         given()
@@ -93,6 +97,7 @@ public class RestAssuredTest {
     }
 
     @Test
+    @DisplayName("Проверка JSON схемы тела пользователя")
     void testSchemaForSingleUser() {
 
         given()
