@@ -1,10 +1,14 @@
 package specstest;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import specstest.models.*;
 
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static specstest.Specs.request;
 import static specstest.Specs.response;
 import static org.assertj.core.api.Assertions.*;
@@ -26,14 +30,16 @@ public class RestAssuredTest {
                 .log().body()
                 .extract().as(SingleUserBodyData.class);
 
-        assertThat(data.getData().getId()).isEqualTo(2);
-        assertThat(data.getData().getEmail()).isEqualTo("janet.weaver@reqres.in");
-        assertThat(data.getData().getFirstName()).isEqualTo("Janet");
-        assertThat(data.getData().getLastName()).isEqualTo("Weaver");
-        assertThat(data.getData().getAvatar()).isEqualTo("https://reqres.in/img/faces/2-image.jpg");
+        assertAll("Check all keys in body",
 
-        assertThat(data.getSupport().getUrl()).isEqualTo("https://reqres.in/#support-heading");
-        assertThat(data.getSupport().getText()).isEqualTo("To keep ReqRes free, contributions towards server costs are appreciated!");
+        () -> assertThat(data.getData().getId()).isEqualTo(2),
+        () -> assertThat(data.getData().getEmail()).isEqualTo("janet.weaver@reqres.in"),
+        () -> assertThat(data.getData().getFirstName()).isEqualTo("Janet"),
+        () -> assertThat(data.getData().getLastName()).isEqualTo("Weaver"),
+        () -> assertThat(data.getData().getAvatar()).isEqualTo("https://reqres.in/img/faces/2-image.jpg"),
+
+        () -> assertThat(data.getSupport().getUrl()).isEqualTo("https://reqres.in/#support-heading"),
+        () -> assertThat(data.getSupport().getText()).isEqualTo("To keep ReqRes free, contributions towards server costs are appreciated!"));
 
     }
 
@@ -60,14 +66,43 @@ public class RestAssuredTest {
 
     }
 
+    @ValueSource(ints = {13, 14, 15, 16})
+    @ParameterizedTest
+    void checkUserNotFound(int id) {
 
+        given()
+                .spec(request)
+                .when()
+                .get("/users/" + id)
+                .then()
+                .statusCode(404);
 
+    }
 
+    @Test
+    void checkStatusCodeDelete() {
 
+        given()
+                .spec(request)
+                .when()
+                .delete("/users/2")
+                .then()
+                .log().all()
+                .statusCode(204);
 
+    }
 
+    @Test
+    void testSchemaForSingleUser() {
 
-
-
+        given()
+                .spec(request)
+                .when()
+                .get("/users/2")
+                .then()
+                .log().status()
+                .log().body()
+                .body(matchesJsonSchemaInClasspath("SchemaForSingleUser.json"));
+    }
 
 }
